@@ -1,0 +1,55 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Đọc dữ liệu
+data = pd.read_csv('Practice2_Chapter2.csv/Practice2_Chapter2.csv')
+
+# Lấy dữ liệu đầu vào và đầu ra
+Xdata = data[['TV', 'Radio', 'Newspaper']].values.T  # X có kích thước (3, m)
+y = data['Sales'].values  # y có kích thước (m,)
+
+# Chuẩn hóa dữ liệu (Feature Scaling - Standardization)
+Xdata = (Xdata - np.mean(Xdata, axis=1, keepdims=True)) / np.std(Xdata, axis=1, keepdims=True)
+
+X = Xdata
+
+# Khởi tạo tham số
+theta = np.zeros(4)  # theta0, theta1, theta2, theta3
+learning_rate = 1e-3
+iterations = 30000
+
+# Hàm dự đoán
+def predict(X, theta):
+    return theta[0] + theta[1] * X[0] + theta[2] * X[1] + theta[3] * X[2]
+
+# Hàm tính chi phí
+def cost_function(X, y, theta):
+    m = len(X[0])
+    return (1/(2*m)) * np.sum((predict(X, theta) - y) ** 2)
+
+# Hàm cập nhật Gradient Descent
+def update_gd():
+    global theta
+    m = len(X[0])
+    gradient = np.zeros(4)  # gradient cho theta0, theta1, theta2, theta3
+
+    # Cập nhật theta0
+    gradient[0] = (1 / m) * np.sum(predict(X, theta) - y)
+
+    # Cập nhật theta1, theta2, theta3
+    for j in range(1, 4):
+        gradient[j] = (1 / m) * np.sum((predict(X, theta) - y) * X[j - 1])
+
+    # Cập nhật theta
+    theta -= learning_rate * gradient
+
+# Vòng lặp Gradient Descent
+for i in range(iterations):
+    update_gd()
+
+# In kết quả
+print("Final theta:", theta)
+print("Final cost:", cost_function(X, y, theta))
+
+
